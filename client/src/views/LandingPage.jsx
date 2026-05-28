@@ -30,20 +30,20 @@ export default function LandingPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-base-200">
-            <div className="card w-96 bg-base-100 shadow-xl">
+        <div className="min-h-screen flex items-center justify-center bg-base-300">
+            <div className="card w-200 h-100 bg-base-100 shadow-xl">
                 <div className="card-body items-center text-center">
-                    <h1 className="text-3xl">Gunting Batu Kertas</h1>
-                    <h2 className="text-xl font-bold">MBG</h2>
-                    <p className="text-sm text-gray-400">Mengobrol Bersama & Gaming</p>
-
+                    <h1 className="text-5xl font-bold">𝐒𝐄𝐋𝐀𝐌𝐀𝐓 𝐃𝐀𝐓𝐀𝐍𝐆 𝐃𝐈 𝐌𝐁𝐆</h1>
+                    <h2 className="text-3xl font-bold">💬 𝐌𝐞𝐧𝐠𝐨𝐛𝐫𝐨𝐥 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 & 𝐆𝐚𝐦𝐢𝐧𝐠 🎮</h2>
+                    {/* <h3 className="text-xl">𝐌𝐞𝐧𝐠𝐨𝐛𝐫𝐨𝐥 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 & 𝐆𝐚𝐦𝐢𝐧𝐠</h3> */}
+                    <p className="text-sm text-gray-400">Tempatnya ngobrol dan main bareng temen kamu!</p>
                     <div className="form-control w-full mt-4">
-                        <label className="label">
-                            <span className="label-text">Masukkan Username</span>
+                        <label className="label w-full pb-2">
+                            <span className="label-text w-full text-left">𝘚𝘪𝘢𝘱𝘢 𝘱𝘢𝘯𝘨𝘨𝘪𝘭𝘢𝘯𝘮𝘶?</span>
                         </label>
                         <input
                             type="text"
-                            placeholder="contoh: priasolo11"
+                            placeholder="Masukkan Username..."
                             className="input input-bordered w-full"
                             value={inputUsername}
                             onChange={(e) => setInputUsername(e.target.value)}
@@ -53,7 +53,7 @@ export default function LandingPage() {
                     </div>
 
                     <button className="btn btn-primary w-full mt-2" onClick={handleJoin}>
-                        Masuk
+                        Join Obrolan
                     </button>
                 </div>
             </div>
