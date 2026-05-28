@@ -4,13 +4,21 @@ export default function Navbar() {
     const { username } = useApp()
 
     return (
-        <div className="navbar bg-base-100 border-b border-base-300">
-            <div className="flex-1">
-                <span className="text-xl font-bold pl-4">𝐌𝐁𝐆</span>
+        <div className="px-6 py-3 flex items-center justify-between border-b border-white/10"
+            style={{background: 'rgba(10,10,15,0.95)', backdropFilter: 'blur(10px)'}}>
+            <div className="flex items-center gap-2">
+                
+                <span className="font-arcade text-sm" style={{color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)'}}>
+                    MBG
+                </span>
+                {/* <span className="text-xl">✂️🪨📄</span> */}
             </div>
-            <div className="flex-none items-center gap-2">
-                <span className="text-sm text-gray-400">𝙷𝚊𝚕𝚘,</span>
-                <span className="text-lg font-bold text-primary">👤 {username}</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10"
+                style={{background: 'rgba(255,255,255,0.05)'}}>
+                <span className="text-sm">👤</span>
+                <span className="text-sm font-bold" style={{color: 'var(--neon-green)'}}>
+                    {username}
+                </span>
             </div>
         </div>
     )

@@ -92,87 +92,119 @@ export default function GamePage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden arcade-bg grid-bg">
       {/* Header */}
-      <div className="p-4 border-b border-base-300 bg-base-100 flex items-center shrink-0">
-        <div className="flex items-center gap-2">
-          <button className="btn btn-ghost btn-sm" onClick={() => {
-            if (!isAiMode) {
-              socket.emit('leave-game', { roomName: roomId })
-            }
+      <div className="p-4 border-b border-white/10 flex items-center shrink-0"
+        style={{ background: 'rgba(10,10,15,0.8)' }}>
+        <button className="px-3 py-1.5 rounded-xl text-xs font-arcade border border-white/10 text-gray-400 hover:text-white transition-all mr-3"
+          onClick={() => {
+            if (!isAiMode) socket.emit('leave-game', { roomName: roomId })
             navigate(-1)
           }}>
-            ❮ 𝐊𝐞𝐦𝐛𝐚𝐥𝐢
-          </button>
-          <h2 className="font-bold">
-            {isAiMode ? '🤖 𝐋𝐚𝐰𝐚𝐧 𝐀𝐈' : '⚔️ 𝐋𝐚𝐰𝐚𝐧 𝐏𝐥𝐚𝐲𝐞𝐫'}
-          </h2>
-        </div>
+          ❮ BACK
+        </button>
+        <h2 className="font-arcade text-xs" style={{ color: isAiMode ? 'var(--neon-pink)' : 'var(--neon-yellow)' }}>
+          {isAiMode ? '🤖 LAWAN AI' : '⚔️ LAWAN PLAYER'}
+        </h2>
       </div>
 
-      {/* Konten game */}
+      {/* Konten */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 overflow-y-auto">
 
-        {/* Notifikasi lawan keluar */}
+        {/* Notif lawan keluar */}
         {opponentLeft && (
-          <div className="alert alert-warning max-w-sm shrink-0">
-            <span>Lawan meninggalkan game!</span>
+          <div className="px-6 py-3 rounded-xl border text-sm font-bold"
+            style={{ background: 'rgba(255,230,0,0.1)', borderColor: 'var(--neon-yellow)', color: 'var(--neon-yellow)' }}>
+            🚪 Lawan meninggalkan game! Kamu menang!
           </div>
         )}
 
         {/* Pilih move */}
         {!result && (
           <>
-            <p className="text-lg">Pilih gerakanmu!</p>
+            <p className="font-arcade text-xs text-gray-400">PILIH GERAKANMU!</p>
             <div className="flex gap-4">
               {MOVES.map((m) => (
                 <button
                   key={m.id}
-                  className={`btn btn-lg flex-col h-28 w-28 text-4xl ${myMove === m.id ? 'btn-primary' : 'btn-outline'}`}
+                  className="flex flex-col items-center justify-center h-28 w-28 rounded-2xl text-4xl transition-all hover:scale-110 active:scale-95"
+                  style={{
+                    background: myMove === m.id
+                      ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-green))'
+                      : 'rgba(255,255,255,0.05)',
+                    border: myMove === m.id
+                      ? 'none'
+                      : '2px solid rgba(255,255,255,0.15)',
+                    boxShadow: myMove === m.id ? '0 0 25px rgba(0,212,255,0.5)' : 'none'
+                  }}
                   onClick={() => handleMove(m.id)}
                   disabled={!!myMove}
                 >
                   {m.emoji}
-                  <span className="text-sm mt-1">{m.label}</span>
+                  <span className="text-xs font-arcade mt-1 text-white">{m.label}</span>
                 </button>
               ))}
             </div>
-            {waiting && <p className="animate-pulse text-gray-400">Menunggu lawan...</p>}
+            {waiting && (
+              <p className="font-arcade text-xs animate-pulse-neon" style={{ color: 'var(--neon-blue)' }}>
+                MENUNGGU LAWAN...
+              </p>
+            )}
           </>
         )}
 
         {/* Hasil */}
         {result && (
-          <div className="flex flex-col items-center gap-4">
-            <h3 className={`text-3xl font-bold ${result === 'win' ? 'text-success' : result === 'lose' ? 'text-error' : 'text-warning'}`}>
-              {result === 'win' ? '🎉 Menang!' : result === 'lose' ? '😢 Kalah!' : '🤝 Seri!'}
+          <div className="flex flex-col items-center gap-6">
+            <h3 className="font-arcade text-2xl"
+              style={{
+                color: result === 'win' ? 'var(--neon-green)' : result === 'lose' ? 'var(--neon-pink)' : 'var(--neon-yellow)',
+                textShadow: `0 0 20px currentColor`
+              }}>
+              {result === 'win' ? '🎉 MENANG!' : result === 'lose' ? '😢 KALAH!' : '🤝 SERI!'}
             </h3>
 
             <div className="flex items-center gap-8 text-6xl">
-              <div className="flex flex-col items-center">
-                <span>{MOVE_EMOJI[myMove]}</span>
-                <p className="text-sm mt-2">Kamu</p>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl"
+                  style={{ background: 'rgba(0,212,255,0.15)', border: '2px solid var(--neon-blue)' }}>
+                  {MOVE_EMOJI[myMove]}
+                </div>
+                <span className="text-xs font-arcade text-gray-400">KAMU</span>
               </div>
-              <span className="text-2xl text-gray-400">vs</span>
-              <div className="flex flex-col items-center">
-                <span>{MOVE_EMOJI[opponentMove]}</span>
-                <p className="text-sm mt-2">{isAiMode ? 'AI' : 'Lawan'}</p>
+              <span className="font-arcade text-base" style={{ color: 'var(--neon-yellow)' }}>VS</span>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl"
+                  style={{ background: 'rgba(255,45,120,0.15)', border: '2px solid var(--neon-pink)' }}>
+                  {MOVE_EMOJI[opponentMove]}
+                </div>
+                <span className="text-xs font-arcade text-gray-400">{isAiMode ? 'AI' : 'LAWAN'}</span>
               </div>
             </div>
 
             {isAiMode && aiHint && (
-              <div className="alert alert-info max-w-sm">
-                <span>🤖 {aiHint}</span>
+              <div className="px-4 py-3 rounded-xl text-sm max-w-sm text-center border"
+                style={{ background: 'rgba(0,212,255,0.1)', borderColor: 'var(--neon-blue)', color: 'var(--neon-blue)' }}>
+                🤖 {aiHint}
               </div>
             )}
 
-            <div className="flex gap-2">
-              <button className="btn btn-primary" onClick={handlePlayAgain}>𝐌𝐚𝐢𝐧 𝐋𝐚𝐠𝐢</button>
-              <button className="btn btn-ghost" onClick={() => {
-                socket.emit('leave-game', { roomName: roomId })
-                navigate(-1)
-              }}>
-                ❮ 𝐊𝐞𝐦𝐛𝐚𝐥𝐢 𝐤𝐞 𝐎𝐛𝐫𝐨𝐥𝐚𝐧
+            <div className="flex gap-3">
+              <button
+                className="px-4 py-2 rounded-xl font-arcade text-xs text-black font-bold transition-all hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, var(--neon-green), var(--neon-blue))', boxShadow: '0 0 15px rgba(57,255,20,0.4)' }}
+                onClick={handlePlayAgain}
+              >
+                MAIN LAGI
+              </button>
+              <button
+                className="px-4 py-2 rounded-xl font-arcade text-xs border border-white/20 text-gray-400 hover:text-white transition-all"
+                onClick={() => {
+                  socket.emit('leave-game', { roomName: roomId })
+                  navigate(-1)
+                }}
+              >
+                ❮ KEMBALI
               </button>
             </div>
           </div>
