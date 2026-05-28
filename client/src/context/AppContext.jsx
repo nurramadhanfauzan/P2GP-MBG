@@ -7,6 +7,8 @@ export default function AppProvider({ children }) {
     const [username, setUsername] = useState('')
     const [onlineUsers, setOnlineUsers] = useState([])
     const [globalMessages, setGlobalMessages] = useState([])
+    const [privateMessages, setPrivateMessages] = useState([])
+    const [playerHistory, setPlayerHistory] = useState([])
 
     return (
         <AppContext.Provider value={{
@@ -16,6 +18,10 @@ export default function AppProvider({ children }) {
             setOnlineUsers,
             globalMessages,
             setGlobalMessages,
+            privateMessages,
+            setPrivateMessages,
+            playerHistory,
+            setPlayerHistory,
             socket
         }}>
             {children}
