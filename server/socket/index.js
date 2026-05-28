@@ -9,19 +9,14 @@ module.exports = (io) => {
         console.log('User connected:', socket.id)
 
         socket.on('join-user', (username) => {
-            const isExist = onlineUsers.find(
-                user =>
-                    user.username === username
-            )
+            const isExist = onlineUsers.find(user => user.username === username)
             if (isExist) {
-                socket.emit(
-                    'username-error',
-                    'Username sudah ada'
-                )
+                socket.emit('username-error', 'Username sudah ada')
                 return
             }
             onlineUsers.push({ socketId: socket.id, username })
             io.emit('online-users', onlineUsers)
+            socket.emit('join-success')
         })
 
         socket.on('send-message', (payload) => {
@@ -30,21 +25,31 @@ module.exports = (io) => {
 
 
         socket.on('join-room', (roomName) => {
-            socket.join(roomName)
+            const rooms = socket.rooms
+            if (!rooms.has(roomName)) {
+                socket.join(roomName)
+            }
+        })
+
+        socket.on('request-online-users', () => {
+            socket.emit('online-users', onlineUsers)
         })
 
         socket.on('private-message', (payload) => {
-            io.to(payload.roomName).emit(
-                'new-private-message', payload
-            )
+            io.to(payload.roomName).emit('new-private-message', payload)
         })
 
-        socket.on('send-challenge', ({ roomName, from }) => {
-            io.to(roomName).emit('game-challenge', { from, roomName })
+        socket.on('send-challenge', ({ roomName, from, to }) => {
+            socket.broadcast.to(roomName).emit('game-challenge', { from, roomName })
+            socket.emit('challenge-sent', { to, roomName })
         })
 
         socket.on('accept-challenge', ({ roomName }) => {
             io.to(roomName).emit('game-start', { roomName })
+        })
+
+        socket.on('cancel-challenge', ({ roomName }) => {
+            io.to(roomName).emit('challenge-cancelled')
         })
 
         socket.on('game-move', ({ roomName, move, username }) => {
@@ -63,8 +68,13 @@ module.exports = (io) => {
             }
         })
 
-        socket.on('fight-ai', async (playerMove) => {
-            const { move: aiChoice, hint } = await aiMove()
+        socket.on('leave-game', ({ roomName }) => {
+            socket.broadcast.to(roomName).emit('opponent-left')
+            delete roomMoves[roomName]
+        })
+
+        socket.on('fight-ai', async ({ move: playerMove, playerHistory }) => {
+            const { move: aiChoice, hint } = await aiMove(playerHistory)
             socket.emit('ai-result', {
                 playerMove,
                 aiChoice,
