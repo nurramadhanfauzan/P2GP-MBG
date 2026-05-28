@@ -10,6 +10,7 @@ export default function AppProvider({ children }) {
     const [privateMessages, setPrivateMessages] = useState([])
     const [playerHistory, setPlayerHistory] = useState([])
     const [unreadMessages, setUnreadMessages] = useState({})
+    const [incomingChallenge, setIncomingChallenge] = useState(null)
 
     useEffect(() => {
         const savedUsername = sessionStorage.getItem('username')
@@ -50,10 +51,15 @@ export default function AppProvider({ children }) {
             }
         })
 
+        socket.on('game-challenge', ({ from, roomName }) => {
+            setIncomingChallenge({ from, roomName })
+        })
+
         return () => {
             socket.off('online-users')
             socket.off('new-message')
             socket.off('new-private-message')
+            socket.off('game-challenge')
         }
     }, [])
 
@@ -71,6 +77,8 @@ export default function AppProvider({ children }) {
             setPlayerHistory,
             unreadMessages,
             setUnreadMessages,
+            incomingChallenge,
+            setIncomingChallenge,
             socket
         }}>
             {children}

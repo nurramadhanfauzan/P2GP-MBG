@@ -30,32 +30,63 @@ export default function LandingPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-base-300">
-            <div className="card w-200 h-100 bg-base-100 shadow-xl">
-                <div className="card-body items-center text-center">
-                    <h1 className="text-5xl font-bold">𝐒𝐄𝐋𝐀𝐌𝐀𝐓 𝐃𝐀𝐓𝐀𝐍𝐆 𝐃𝐈 𝐌𝐁𝐆</h1>
-                    <h2 className="text-3xl font-bold">💬 𝐌𝐞𝐧𝐠𝐨𝐛𝐫𝐨𝐥 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 & 𝐆𝐚𝐦𝐢𝐧𝐠 🎮</h2>
-                    {/* <h3 className="text-xl">𝐌𝐞𝐧𝐠𝐨𝐛𝐫𝐨𝐥 𝐁𝐞𝐫𝐬𝐚𝐦𝐚 & 𝐆𝐚𝐦𝐢𝐧𝐠</h3> */}
-                    <p className="text-sm text-gray-400">Tempatnya ngobrol dan main bareng temen kamu!</p>
-                    <div className="form-control w-full mt-4">
-                        <label className="label w-full pb-2">
-                            <span className="label-text w-full text-left">𝘚𝘪𝘢𝘱𝘢 𝘱𝘢𝘯𝘨𝘨𝘪𝘭𝘢𝘯𝘮𝘶?</span>
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Masukkan Username..."
-                            className="input input-bordered w-full"
-                            value={inputUsername}
-                            onChange={(e) => setInputUsername(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                        />
-                        {error && <p className="text-error text-sm mt-1">{error}</p>}
-                    </div>
+        <div className="min-h-screen flex items-center justify-center arcade-bg grid-bg relative overflow-hidden">
+            {/* Decorative blobs */}
+            <div className="absolute top-10 left-10 w-32 h-32 rounded-full opacity-20 blur-xl" style={{background: 'var(--neon-pink)'}}></div>
+            <div className="absolute bottom-10 right-10 w-40 h-40 rounded-full opacity-20 blur-xl" style={{background: 'var(--neon-blue)'}}></div>
+            <div className="absolute top-1/2 left-5 w-20 h-20 rounded-full opacity-10 blur-xl" style={{background: 'var(--neon-green)'}}></div>
 
-                    <button className="btn btn-primary w-full mt-2" onClick={handleJoin}>
-                        Join Obrolan
-                    </button>
+            <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-md px-4">
+                {/* Logo */}
+                <div className="text-center animate-float">
+                    <div className="text-6xl mb-2">✂️🪨📄</div>
+                    <h1 className="font-arcade text-2xl mb-1" style={{color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)'}}>
+                        MBG
+                    </h1>
+                    <p className="text-xs font-arcade" style={{color: 'var(--neon-pink)'}}>
+                        Mengobrol Bersama & Gaming
+                    </p>
                 </div>
+
+                {/* Card */}
+                <div className="w-full rounded-2xl p-6 border border-white/10 backdrop-blur-sm" 
+                    style={{background: 'rgba(255,255,255,0.05)', boxShadow: '0 0 40px rgba(0,212,255,0.15)'}}>
+                    
+                    <p className="text-center text-gray-400 text-sm mb-6">
+                        Tempatnya ngobrol dan main bareng temen kamu! 🎮
+                    </p>
+
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <label className="block text-xs font-arcade mb-2" style={{color: 'var(--neon-green)'}}>
+                                SIAPA PANGGILANMU?
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Masukkan username..."
+                                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all"
+                                style={{caretColor: 'var(--neon-blue)'}}
+                                value={inputUsername}
+                                onChange={(e) => setInputUsername(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                            />
+                            {error && <p className="text-xs mt-2" style={{color: 'var(--neon-pink)'}}>{error}</p>}
+                        </div>
+
+                        <button
+                            className="w-full py-3 rounded-xl font-arcade text-sm text-black font-bold transition-all hover:scale-105 active:scale-95"
+                            style={{
+                                background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-green))',
+                                boxShadow: '0 0 20px rgba(0,212,255,0.5)'
+                            }}
+                            onClick={handleJoin}
+                        >
+                            MASUK! 🚀
+                        </button>
+                    </div>
+                </div>
+
+                <p className="text-xs text-gray-600 font-arcade">v1.0.0 — P2GP MBG</p>
             </div>
         </div>
     )

@@ -48,6 +48,10 @@ module.exports = (io) => {
             io.to(roomName).emit('game-start', { roomName })
         })
 
+        socket.on('reject-challenge', ({ roomName }) => {
+            socket.broadcast.to(roomName).emit('challenge-rejected')
+        })
+
         socket.on('cancel-challenge', ({ roomName }) => {
             io.to(roomName).emit('challenge-cancelled')
         })

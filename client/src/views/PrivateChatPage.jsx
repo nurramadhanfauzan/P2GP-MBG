@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext'
 
 export default function PrivateChatPage() {
   const { roomId } = useParams()
-  const { socket, username, privateMessages, setUnreadMessages } = useApp()
+  const { socket, username, privateMessages, setUnreadMessages, incomingChallenge, setIncomingChallenge } = useApp()
   const opponentName = roomId.split('_').find(name => name !== username)
   const [input, setInput] = useState('')
   const [challengeFrom, setChallengeFrom] = useState(null)
@@ -14,10 +14,6 @@ export default function PrivateChatPage() {
   useEffect(() => {
     socket.emit('join-room', roomId)
     setUnreadMessages((prev) => ({ ...prev, [roomId]: 0 }))
-
-    socket.on('game-challenge', ({ from, roomName }) => {
-      setChallengeFrom({ from, roomName })
-    })
 
     socket.on('game-start', ({ roomName }) => {
       navigate(`/game/${roomName}`)
@@ -31,12 +27,15 @@ export default function PrivateChatPage() {
       setChallengeFrom(null)
       setChallengeSent(false)
     })
+    socket.on('challenge-rejected', () => {
+      setChallengeSent(false)
+    })
 
     return () => {
-      socket.off('game-challenge')
       socket.off('game-start')
       socket.off('challenge-sent')
       socket.off('challenge-cancelled')
+      socket.off('challenge-rejected')
     }
   }, [])
 
@@ -53,8 +52,13 @@ export default function PrivateChatPage() {
   }
 
   const handleAccept = () => {
-    socket.emit('accept-challenge', { roomName: challengeFrom.roomName })
-    setChallengeFrom(null)
+    socket.emit('accept-challenge', { roomName: incomingChallenge.roomName })
+    setIncomingChallenge(null)
+  }
+
+  const handleReject = () => {
+    socket.emit('reject-challenge', { roomName: incomingChallenge.roomName })
+    setIncomingChallenge(null)
   }
 
   const handleCancel = () => {
@@ -63,46 +67,76 @@ export default function PrivateChatPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden arcade-bg">
       {/* Header */}
-      <div className="p-4 border-b border-base-300 bg-base-100 flex justify-between items-center shrink-0">
+      <div className="p-4 border-b border-white/10 flex justify-between items-center shrink-0"
+        style={{ background: 'rgba(10,10,15,0.8)' }}>
         <div className="flex items-center gap-2">
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/chat')}>
-            ❮ 𝐊𝐞𝐦𝐛𝐚𝐥𝐢
+          <button className="px-3 py-1.5 rounded-xl text-xs font-arcade transition-all hover:scale-105 border border-white/10 text-gray-400 hover:text-white"
+            onClick={() => navigate('/chat')}>
+            ❮ BACK
           </button>
-          <h2 className="font-bold">💬 {opponentName}</h2>
+          <h2 className="font-bold text-sm">💬 <span style={{ color: 'var(--neon-blue)' }}>{opponentName}</span></h2>
         </div>
-        <button className="btn btn-warning btn-sm" onClick={handleChallenge}>
-          𝐔𝐧𝐣𝐮𝐤 𝐁𝐚𝐤𝐚𝐭
+        <button
+          className="px-3 py-1.5 rounded-xl font-arcade text-xs text-black font-bold transition-all hover:scale-105"
+          style={{ background: 'linear-gradient(135deg, var(--neon-yellow), var(--neon-pink))', boxShadow: '0 0 10px rgba(255,230,0,0.3)' }}
+          onClick={handleChallenge}
+        >
+          ⚔️ TANTANG
         </button>
       </div>
 
-      {/* Notifikasi untuk yang menantang */}
-      {challengeSent && (
-        <div className="alert alert-warning mx-4 mt-2 flex justify-between shrink-0">
-          <span>⚔️ Kamu menantang <strong>{opponentName}</strong>!</span>
-          <button className="btn btn-error btn-sm" onClick={handleCancel}>
-            Batalkan
-          </button>
+      {incomingChallenge && incomingChallenge.roomName === roomId && (
+        <div className="mx-4 mt-2 p-3 rounded-xl flex justify-between items-center shrink-0 border"
+          style={{ background: 'rgba(0,212,255,0.1)', borderColor: 'var(--neon-blue)' }}>
+          <span className="text-sm">⚔️ <strong style={{ color: 'var(--neon-blue)' }}>{incomingChallenge.from}</strong> menantangmu!</span>
+          <div className="flex gap-2">
+            <button className="px-2 py-1 rounded-lg text-xs font-arcade"
+              style={{ background: 'var(--neon-green)', color: 'black' }}
+              onClick={handleAccept}>TERIMA</button>
+            <button className="px-2 py-1 rounded-lg text-xs font-arcade"
+              style={{ background: 'var(--neon-pink)', color: 'black' }}
+              onClick={handleReject}>TOLAK</button>
+          </div>
         </div>
       )}
 
-      {/* Notifikasi untuk yang ditantang */}
+      {/* Notifikasi challenger */}
+      {challengeSent && (
+        <div className="mx-4 mt-2 p-3 rounded-xl flex justify-between items-center shrink-0 border"
+          style={{ background: 'rgba(255,230,0,0.1)', borderColor: 'var(--neon-yellow)' }}>
+          <span className="text-sm">⚔️ Kamu menantang <strong style={{ color: 'var(--neon-yellow)' }}>{opponentName}</strong>!</span>
+          <button className="px-2 py-1 rounded-lg text-xs font-arcade"
+            style={{ background: 'var(--neon-pink)', color: 'black' }}
+            onClick={handleCancel}>BATAL</button>
+        </div>
+      )}
+
+      {/* Notifikasi yang ditantang */}
       {challengeFrom && (
-        <div className="alert alert-info mx-4 mt-2 flex justify-between shrink-0">
-          <span>⚔️ <strong>{challengeFrom.from}</strong> menantangmu!</span>
-          <button className="btn btn-success btn-sm" onClick={handleAccept}>
-            Terima
-          </button>
+        <div className="mx-4 mt-2 p-3 rounded-xl flex justify-between items-center shrink-0 border"
+          style={{ background: 'rgba(0,212,255,0.1)', borderColor: 'var(--neon-blue)' }}>
+          <span className="text-sm">⚔️ <strong style={{ color: 'var(--neon-blue)' }}>{challengeFrom.from}</strong> menantangmu!</span>
+          <button className="px-2 py-1 rounded-lg text-xs font-arcade"
+            style={{ background: 'var(--neon-green)', color: 'black' }}
+            onClick={handleAccept}>TERIMA</button>
         </div>
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
         {roomMessages.map((msg, i) => (
           <div key={i} className={`chat ${msg.from === username ? 'chat-end' : 'chat-start'}`}>
-            <div className="chat-header text-xs opacity-50">{msg.from}</div>
-            <div className={`chat-bubble ${msg.from === username ? 'chat-bubble-primary' : ''}`}>
+            <div className="chat-header text-xs opacity-50 mb-1">{msg.from}</div>
+            <div className={`chat-bubble text-sm ${msg.from === username
+              ? 'text-black font-semibold'
+              : 'bg-white/10 text-white border border-white/10'
+              }`}
+              style={msg.from === username ? {
+                background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-green))',
+                boxShadow: '0 0 10px rgba(0,212,255,0.3)'
+              } : {}}>
               {msg.text}
             </div>
           </div>
@@ -110,16 +144,22 @@ export default function PrivateChatPage() {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-base-300 flex gap-2 shrink-0">
+      <div className="p-4 border-t border-white/10 flex gap-2 shrink-0" style={{ background: 'rgba(10,10,15,0.8)' }}>
         <input
           type="text"
-          className="input input-bordered flex-1"
+          className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all text-sm"
           placeholder="Ketik pesan..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
         />
-        <button className="btn btn-primary" onClick={handleSend}>𝐊𝐢𝐫𝐢𝐦</button>
+        <button
+          className="px-4 py-2 rounded-xl font-arcade text-xs text-black font-bold transition-all hover:scale-105"
+          style={{ background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-green))', boxShadow: '0 0 15px rgba(0,212,255,0.4)' }}
+          onClick={handleSend}
+        >
+          KIRIM
+        </button>
       </div>
     </div>
   )
